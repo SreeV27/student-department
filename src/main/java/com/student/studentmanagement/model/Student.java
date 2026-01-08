@@ -33,6 +33,9 @@ import java.time.LocalDateTime;
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = "email"),
                 @UniqueConstraint(columnNames = "mobile")
+        },
+        indexes = {
+                @Index(name = "idx_student", columnList = "id,email,mobile")
         }
 )
 public class Student {

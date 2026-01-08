@@ -31,6 +31,9 @@ import java.util.List;
         name = "department",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = "name")
+        },
+        indexes = {
+                @Index(name = "idx_dept", columnList = "id,name")
         }
 )
 public class Department {
@@ -53,5 +56,8 @@ public class Department {
             orphanRemoval = true
     )
     private List<Student> students = new ArrayList<>();
+
+    @Column(name = "description")
+    private String description;
 
 }

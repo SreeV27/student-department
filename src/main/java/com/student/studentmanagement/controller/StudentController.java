@@ -13,8 +13,12 @@ import com.student.studentmanagement.dto.StudentDto;
 import com.student.studentmanagement.dto.StudentRequest;
 import com.student.studentmanagement.service.StudentService;
 import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -56,4 +60,22 @@ public class StudentController {
     public StudentDto getStudentByMobile(@PathVariable String mobile) {
         return studentService.getStudentByMobile(mobile);
     }
+
+    //Update Student
+    @PutMapping("/{id}")
+    public StudentDto updateStudent(@PathVariable Long id, @Valid @RequestBody StudentRequest request) {
+        return studentService.updateStudent(id, request);
+    }
+
+    //Delete Student
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> deleteStudent(@PathVariable Long id) {
+
+        String message = studentService.deleteStudent(id);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", message);
+        return ResponseEntity.ok(response);
+    }
+
+
 }

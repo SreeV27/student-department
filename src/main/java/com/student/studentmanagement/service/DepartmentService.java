@@ -14,6 +14,7 @@ import com.student.studentmanagement.exception.DuplicateRecordException;
 import com.student.studentmanagement.exception.ResourceNotFoundException;
 import com.student.studentmanagement.model.Department;
 import com.student.studentmanagement.repository.DepartmentRepository;
+import com.student.studentmanagement.repository.StudentRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -21,11 +22,14 @@ import java.util.List;
 public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
-
-    public DepartmentService(DepartmentRepository departmentRepository) {
+    private final StudentRepository studentRepository;
+    private static final String FOUNDLING = "Department not found";
+    public DepartmentService(DepartmentRepository departmentRepository, StudentRepository studentRepository) {
         this.departmentRepository = departmentRepository;
+        this.studentRepository = studentRepository;
     }
 
+    // Create Department
     public DepartmentDto createDepartment(Department department) {
         if (departmentRepository.existsByName(department.getName())) {
             throw new DuplicateRecordException("Department already exists");
@@ -34,26 +38,64 @@ public class DepartmentService {
         DepartmentDto dto = new DepartmentDto();
         dto.setId(dept.getId());
         dto.setName(dept.getName());
+        dto.setDescription(dept.getDescription());
         return dto;
     }
 
+    // Get all Departments
     public List<DepartmentDto> getAllDepartments() {
-        return departmentRepository.findAll()
-                .stream()
+        List<Department> departments = departmentRepository.findAllByOrderByNameAsc();
+        if (departments.isEmpty()) {
+            throw new ResourceNotFoundException("No departments found");
+        }
+        return departments.stream()
                 .map(this::mapToDto)
                 .toList();
     }
 
+    // Get Department by ID
     public DepartmentDto getDepartmentById(Long id) {
         Department dept = departmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Department not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(FOUNDLING));
         return mapToDto(dept);
     }
 
+    // Update Department
+    public DepartmentDto updateDepartment(Long id, Department department) {
+        Department existingDept = departmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(FOUNDLING));
+
+        if (!existingDept.getName().equals(department.getName()) &&
+                departmentRepository.existsByName(department.getName())) {
+            throw new DuplicateRecordException("Department name already exists");
+        }
+
+        existingDept.setName(department.getName());
+        existingDept.setDescription(department.getDescription());
+        Department updatedDept = departmentRepository.save(existingDept);
+        return mapToDto(updatedDept);
+    }
+
+    // Delete Department
+    public String deleteDepartment(Long id) {
+        Department dept = departmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(FOUNDLING));
+        boolean hasStudents = studentRepository.existsByDepartmentId(id);
+        if (hasStudents) {
+            throw new IllegalStateException(
+                    "Department cannot be deleted because students are assigned to it"
+            );
+        }
+        departmentRepository.delete(dept);
+        return "Department deleted successfully";
+    }
+
+    // Map Department to DepartmentDto
     private DepartmentDto mapToDto(Department dept) {
         DepartmentDto dto = new DepartmentDto();
         dto.setId(dept.getId());
         dto.setName(dept.getName());
+        dto.setDescription(dept.getDescription());
         return dto;
     }
 }
