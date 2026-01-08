@@ -10,6 +10,7 @@
 
 package com.student.studentmanagement.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -39,6 +40,7 @@ public class StudentRequest {
     private String mobile;
 
     @NotNull(message = "Date of birth is mandatory")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dob;
 
     @NotNull(message = "Department ID is mandatory")
