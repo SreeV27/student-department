@@ -26,7 +26,7 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final DepartmentRepository departmentRepository;
-    private static final String FOUNDLING = "Student not found";
+    private static final String STUD_NOT_FOUND = "Student not found";
 
     public StudentService(StudentRepository studentRepository,
                           DepartmentRepository departmentRepository) {
@@ -74,7 +74,7 @@ public class StudentService {
     @Cacheable(value = "student", key = "#id")
     public StudentDto getStudentById(Long id) {
         Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(FOUNDLING));
+                .orElseThrow(() -> new ResourceNotFoundException(STUD_NOT_FOUND));
 
         return mapToDto(student);
     }
@@ -99,14 +99,14 @@ public class StudentService {
     // Get Student by Mobile
     public StudentDto getStudentByMobile(String mobile) {
         Student student = studentRepository.findByMobile(mobile)
-                .orElseThrow(() -> new ResourceNotFoundException(FOUNDLING));
+                .orElseThrow(() -> new ResourceNotFoundException(STUD_NOT_FOUND));
         return mapToDto(student);
     }
 
     // Update Student
     public StudentDto updateStudent(Long id, StudentRequest request) {
         Student existingStudent = studentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(FOUNDLING));
+                .orElseThrow(() -> new ResourceNotFoundException(STUD_NOT_FOUND));
 
         if (!existingStudent.getEmail().equals(request.getEmail()) &&
                 studentRepository.existsByEmail(request.getEmail())) {
@@ -134,7 +134,7 @@ public class StudentService {
     // Delete Student
     public String  deleteStudent(Long id) {
         Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(FOUNDLING));
+                .orElseThrow(() -> new ResourceNotFoundException(STUD_NOT_FOUND));
         studentRepository.delete(student);
         return "Student deleted successfully";
     }

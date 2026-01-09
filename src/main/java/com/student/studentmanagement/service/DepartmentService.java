@@ -23,7 +23,7 @@ public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
     private final StudentRepository studentRepository;
-    private static final String FOUNDLING = "Department not found";
+    private static final String DEPT_NOT_FOUND = "Department not found";
     public DepartmentService(DepartmentRepository departmentRepository, StudentRepository studentRepository) {
         this.departmentRepository = departmentRepository;
         this.studentRepository = studentRepository;
@@ -56,14 +56,14 @@ public class DepartmentService {
     // Get Department by ID
     public DepartmentDto getDepartmentById(Long id) {
         Department dept = departmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(FOUNDLING));
+                .orElseThrow(() -> new ResourceNotFoundException(DEPT_NOT_FOUND));
         return mapToDto(dept);
     }
 
     // Update Department
     public DepartmentDto updateDepartment(Long id, Department department) {
         Department existingDept = departmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(FOUNDLING));
+                .orElseThrow(() -> new ResourceNotFoundException(DEPT_NOT_FOUND));
 
         if (!existingDept.getName().equals(department.getName()) &&
                 departmentRepository.existsByName(department.getName())) {
@@ -79,7 +79,7 @@ public class DepartmentService {
     // Delete Department
     public String deleteDepartment(Long id) {
         Department dept = departmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(FOUNDLING));
+                .orElseThrow(() -> new ResourceNotFoundException(DEPT_NOT_FOUND));
         boolean hasStudents = studentRepository.existsByDepartmentId(id);
         if (hasStudents) {
             throw new IllegalStateException(
